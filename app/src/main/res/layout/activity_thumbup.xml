@@ -43,6 +43,8 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center_horizontal"
+            app:select_img="@drawable/ic_messages_like_selected"
+            app:unselect_img="@drawable/ic_messages_like_unselected"
             android:padding="10dp"/>
 
 </LinearLayout>

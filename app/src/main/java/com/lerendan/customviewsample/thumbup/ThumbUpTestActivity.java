@@ -1,6 +1,7 @@
 package com.lerendan.customviewsample.thumbup;
 
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
@@ -47,6 +48,15 @@ public class ThumbUpTestActivity extends AppCompatActivity {
             }
         });
         //根据回调Toast的显示可以看出，之前的版本虽然结果正确但是会对回调有可能重复调用多次。
+
+
+        Handler mHandler = new Handler();
+        mHandler.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+
+            }
+        }, 800000L);
     }
 
     public void setNum(View v) {

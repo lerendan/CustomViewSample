@@ -23,4 +23,9 @@
         <attr name="tuv_isThumbUp" format="boolean"/>
     </declare-styleable>
 
+    <declare-styleable name="MyThumbView">
+        <attr name="select_img" format="reference"/>
+        <attr name="unselect_img" format="reference"/>
+    </declare-styleable>
+
 </resources>

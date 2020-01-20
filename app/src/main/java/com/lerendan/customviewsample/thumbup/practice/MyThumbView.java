@@ -5,6 +5,7 @@ import android.animation.AnimatorListenerAdapter;
 import android.animation.AnimatorSet;
 import android.animation.ObjectAnimator;
 import android.content.Context;
+import android.content.res.TypedArray;
 import android.graphics.*;
 import android.util.AttributeSet;
 import android.view.View;
@@ -23,10 +24,10 @@ public class MyThumbView extends View implements View.OnClickListener {
 
     private boolean mIsThumb;
     private Bitmap mThumbBitmap, mNotThumbBitmap;
-    private Paint mBitmapPaint;
-    private Point mBitmapPoint;
+    private Paint mBitmapPaint, mCirclePaint;
+    private Point mBitmapPoint, mCircleCenterPoint;
 
-    private float thumbScale;
+    private int mSelectDrawableId, mUnSelectDrawableId;
 
     public MyThumbView(Context context) {
         this(context, null);
@@ -38,12 +39,16 @@ public class MyThumbView extends View implements View.OnClickListener {
 
     public MyThumbView(Context context, AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
+        TypedArray typedArray = context.obtainStyledAttributes(attrs, R.styleable.MyThumbView);
+        mSelectDrawableId = typedArray.getResourceId(R.styleable.MyThumbView_select_img, 0);
+        mUnSelectDrawableId = typedArray.getResourceId(R.styleable.MyThumbView_unselect_img, 0);
+        typedArray.recycle();
         init();
     }
 
     private void init() {
-        mThumbBitmap = BitmapFactory.decodeResource(getResources(), R.drawable.ic_messages_like_selected);
-        mNotThumbBitmap = BitmapFactory.decodeResource(getResources(), R.drawable.ic_messages_like_unselected);
+        mThumbBitmap = BitmapFactory.decodeResource(getResources(), mSelectDrawableId);
+        mNotThumbBitmap = BitmapFactory.decodeResource(getResources(), mUnSelectDrawableId);
         mBitmapPaint = new Paint(Paint.ANTI_ALIAS_FLAG | Paint.DITHER_FLAG);
         mBitmapPoint = new Point();
         setOnClickListener(this);
@@ -140,10 +145,9 @@ public class MyThumbView extends View implements View.OnClickListener {
     }
 
     public void setThumbScale(float thumbScale) {
-        this.thumbScale = thumbScale;
         Matrix matrix = new Matrix();
-        matrix.postScale(this.thumbScale, this.thumbScale);
-        mThumbBitmap = BitmapFactory.decodeResource(getResources(), R.drawable.ic_messages_like_selected);
+        matrix.postScale(thumbScale, thumbScale);
+        mThumbBitmap = BitmapFactory.decodeResource(getResources(), mSelectDrawableId);
         mThumbBitmap = Bitmap.createBitmap(mThumbBitmap, 0, 0, mThumbBitmap.getWidth(), mThumbBitmap.getHeight(),
                 matrix, true);
         postInvalidate();
@@ -152,7 +156,7 @@ public class MyThumbView extends View implements View.OnClickListener {
     public void setNotThumbScale(float notThumbScale) {
         Matrix matrix = new Matrix();
         matrix.postScale(notThumbScale, notThumbScale);
-        mNotThumbBitmap = BitmapFactory.decodeResource(getResources(), R.drawable.ic_messages_like_unselected);
+        mNotThumbBitmap = BitmapFactory.decodeResource(getResources(), mUnSelectDrawableId);
         mNotThumbBitmap = Bitmap.createBitmap(mNotThumbBitmap, 0, 0, mNotThumbBitmap.getWidth(), mNotThumbBitmap.getHeight(),
                 matrix, true);
         postInvalidate();
