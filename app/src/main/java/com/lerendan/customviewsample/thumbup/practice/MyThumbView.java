@@ -39,10 +39,10 @@ public class MyThumbView extends View implements View.OnClickListener {
 
     public MyThumbView(Context context, AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
-        TypedArray typedArray = context.obtainStyledAttributes(attrs, R.styleable.MyThumbView);
-        mSelectDrawableId = typedArray.getResourceId(R.styleable.MyThumbView_select_img, 0);
-        mUnSelectDrawableId = typedArray.getResourceId(R.styleable.MyThumbView_unselect_img, 0);
-        typedArray.recycle();
+//        TypedArray typedArray = context.obtainStyledAttributes(attrs, R.styleable.MyThumbView);
+//        mSelectDrawableId = typedArray.getResourceId(R.styleable.MyThumbView_select_img, 0);
+//        mUnSelectDrawableId = typedArray.getResourceId(R.styleable.MyThumbView_unselect_img, 0);
+//        typedArray.recycle();
         init();
     }
 

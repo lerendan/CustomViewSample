@@ -17,6 +17,7 @@
             </intent-filter>
         </activity>
         <activity android:name=".thumbup.ThumbUpTestActivity"/>
+        <activity android:name=".ruler.RulerTestActivity"/>
     </application>
 
 </manifest>
