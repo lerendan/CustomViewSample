@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical">
+
+    <!--<com.lerendan.customviewsample.study.DashBoard-->
+            <!--android:layout_width="match_parent"-->
+            <!--android:layout_height="match_parent"/>-->
+
+    <!--<com.lerendan.customviewsample.study.PieChart-->
+            <!--android:layout_width="match_parent"-->
+            <!--android:layout_height="match_parent"/>-->
+
+    <!--<com.lerendan.customviewsample.study.AvaterView-->
+            <!--android:layout_width="match_parent"-->
+            <!--android:layout_height="match_parent"/>-->
+
+    <com.lerendan.customviewsample.study.ImageTextView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"/>
+
+</LinearLayout>

@@ -4,8 +4,8 @@ import android.content.Intent
 import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
 import android.view.View
-import android.widget.Toast
 import com.lerendan.customviewsample.ruler.RulerTestActivity
+import com.lerendan.customviewsample.study.TestActivity
 import com.lerendan.customviewsample.thumbup.ThumbUpTestActivity
 import kotlinx.android.synthetic.main.activity_main.*
 
@@ -22,5 +22,9 @@ class MainActivity : AppCompatActivity() {
         btn_ruler.setOnClickListener {
             startActivity(Intent(this, RulerTestActivity().javaClass))
         }
+    }
+
+    fun dashboard(view: View) {
+        startActivity(Intent(this, TestActivity().javaClass))
     }
 }
