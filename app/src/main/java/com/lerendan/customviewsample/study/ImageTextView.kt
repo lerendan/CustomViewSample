@@ -15,9 +15,10 @@ import com.lerendan.customviewsample.Utils
 class ImageTextView(context: Context?, attrs: AttributeSet?) : View(context, attrs) {
 
     val BITMAP_WIDTH = Utils.dp2px(100)
-    val TEXT = "广东省广州市深圳市 Android123广东省广州市深圳市 Android123广东省广州市深圳市 Android123广东省广州市深圳市 Android123" +
-            "广东省广州市深圳市 Android123广东省广州市深圳市 Android123广东省广州市深圳市 Android123广东省广州市深圳市 Android123" +
-            "广东省广州市深圳市 Android123广东省广州市深圳市 Android123广东省广州市深圳市 Android123广东省广州市深圳市 Android123"
+    val TEXT = "广东省广州市深圳市 Android123广东省广州市深圳市 Android123广东省广州市深圳市 Android123" +
+            "广东省广州市深圳市 Android123广东省广州市深圳市 Android123广东省广州市深圳市 Android123" +
+            "广东省广州市深圳市 Android123广东省广州市深圳市 Android123广东省广州市深圳市 Android123" +
+            "广东省广州市深圳市 Android123广东省广州市深圳市 Android123广东省广州市深圳市 Android123"
 
     var mPaint = TextPaint()
     var mBitmap: Bitmap
