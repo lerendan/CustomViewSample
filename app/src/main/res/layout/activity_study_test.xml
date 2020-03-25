@@ -6,18 +6,22 @@
         android:orientation="vertical">
 
     <!--<com.lerendan.customviewsample.study.DashBoard-->
-            <!--android:layout_width="match_parent"-->
-            <!--android:layout_height="match_parent"/>-->
+    <!--android:layout_width="match_parent"-->
+    <!--android:layout_height="match_parent"/>-->
 
     <!--<com.lerendan.customviewsample.study.PieChart-->
-            <!--android:layout_width="match_parent"-->
-            <!--android:layout_height="match_parent"/>-->
+    <!--android:layout_width="match_parent"-->
+    <!--android:layout_height="match_parent"/>-->
 
     <!--<com.lerendan.customviewsample.study.AvaterView-->
-            <!--android:layout_width="match_parent"-->
-            <!--android:layout_height="match_parent"/>-->
+    <!--android:layout_width="match_parent"-->
+    <!--android:layout_height="match_parent"/>-->
 
-    <com.lerendan.customviewsample.study.ImageTextView
+    <!--<com.lerendan.customviewsample.study.ImageTextView-->
+    <!--android:layout_width="match_parent"-->
+    <!--android:layout_height="match_parent"/>-->
+
+    <com.lerendan.customviewsample.study.RotateView
             android:layout_width="match_parent"
             android:layout_height="match_parent"/>
 

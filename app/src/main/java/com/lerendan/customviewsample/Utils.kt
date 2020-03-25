@@ -59,4 +59,8 @@ object Utils {
         options.inTargetDensity = reqWidth
         return BitmapFactory.decodeResource(res, resId, options)
     }
+
+    fun getZForCamera() : Float{
+        return -6 * Resources.getSystem().displayMetrics.density
+    }
 }
