@@ -1,5 +1,7 @@
 package com.lerendan.customviewsample.study
 
+import android.animation.AnimatorSet
+import android.animation.ObjectAnimator
 import android.content.Context
 import android.graphics.*
 import android.util.AttributeSet
@@ -18,57 +20,88 @@ class RotateView(context: Context?, attrs: AttributeSet?) : View(context, attrs)
     var mBitmap: Bitmap
     var mPaint = Paint(Paint.ANTI_ALIAS_FLAG)
 
-    var mBitmapStartPoint = PointF()//绘制图片的起点（左上角）
-    var mBitmapCenterPoint = PointF()//绘制图片的中心点
+    var mCenterPoint = PointF()//绘制图片的中心点
+
+    var leftFlip = 0f
+        set(value) {
+            field = value
+            invalidate()
+        }
+    var rightFlip = 0f
+        set(value) {
+            field = value
+            invalidate()
+        }
+    var flipRotation = 0f
+        set(value) {
+            field = value
+            invalidate()
+        }
 
     init {
         mBitmap = Utils.decodeBitmap(resources, R.drawable.flip, BITMAP_WIDTH.toInt())
         mCamera.setLocation(0f, 0f, Utils.getZForCamera())
+
+        //右边翻转
+        val rightFlipAnimator = ObjectAnimator.ofFloat(this, "rightFlip", -45f)
+        rightFlipAnimator.duration = 1500
+//        rightFlipAnimator.startDelay = 1000
+//        rightFlipAnimator.start()
+
+        val flipRotationAnimator = ObjectAnimator.ofFloat(this, "flipRotation", 270f)
+        flipRotationAnimator.duration = 1500
+//        flipRotationAnimator.startDelay = 1000
+//        flipRotationAnimator.start()
+
+        val leftFlitAnimator = ObjectAnimator.ofFloat(this, "leftFlip", 45f)
+        leftFlitAnimator.duration = 1500
+//        leftFlitAnimator.startDelay = 1000
+//        leftFlitAnimator.start()
+
+        val animatorSet = AnimatorSet()
+        animatorSet.playSequentially(rightFlipAnimator, flipRotationAnimator, leftFlitAnimator)
+        animatorSet.startDelay = 1000
+        animatorSet.start()
+
+
     }
 
     override fun onSizeChanged(w: Int, h: Int, oldw: Int, oldh: Int) {
         super.onSizeChanged(w, h, oldw, oldh)
-        mBitmapStartPoint.x = width / 2 - BITMAP_WIDTH / 2
-        mBitmapStartPoint.y = height / 2 - BITMAP_WIDTH / 2
-        mBitmapCenterPoint.x = width / 2f
-        mBitmapCenterPoint.y = height / 2f
+        mCenterPoint.x = width / 2f
+        mCenterPoint.y = height / 2f
     }
 
     override fun onDraw(canvas: Canvas) {
         super.onDraw(canvas)
+        //将图片绘制切割成两部分，右边部分进行camera翻转投影
 
-        //1 将图片绘制在中间
-//        canvas.drawBitmap(mBitmap, mBitmapCenterPoint.x, mBitmapCenterPoint.y, mPaint)
-
-        //2 将图片绘制切割成两部分，右边部分进行camera翻转投影
+        //绘制左边
         canvas.save()
-
+        canvas.translate(mCenterPoint.x, mCenterPoint.y)
+        canvas.rotate(-flipRotation)
         mCamera.save()
-        mCamera.rotateY(-30f)
-        canvas.translate(mBitmapCenterPoint.x, mBitmapCenterPoint.y)
+        mCamera.rotateY(leftFlip)
         mCamera.applyToCanvas(canvas)
-        canvas.translate(-mBitmapCenterPoint.x, -mBitmapCenterPoint.y)
         mCamera.restore()
-
-        canvas.clipRect(
-            mBitmapCenterPoint.x.toInt(),
-            mBitmapStartPoint.y.toInt(),
-            (mBitmapStartPoint.x + BITMAP_WIDTH).toInt(),
-            (mBitmapStartPoint.y + BITMAP_WIDTH).toInt()
-        )
-        canvas.drawBitmap(mBitmap, mBitmapStartPoint.x, mBitmapStartPoint.y, mPaint)
+        canvas.clipRect(-BITMAP_WIDTH.toInt(), -BITMAP_WIDTH.toInt(), 0, BITMAP_WIDTH.toInt())
+        canvas.rotate(flipRotation)
+        canvas.translate(-mCenterPoint.x, -mCenterPoint.y)
+        canvas.drawBitmap(mBitmap, mCenterPoint.x - BITMAP_WIDTH / 2, mCenterPoint.y - BITMAP_WIDTH / 2, mPaint)
         canvas.restore()
 
-
-//        canvas.save()
-//
-//        mCamera.save() // 保存 Camera 的状态
-//        mCamera.rotateX(30f) // 旋转 Camera 的三维空间
-//        canvas.translate(Utils.dp2px(150), Utils.dp2px(150)) // 旋转之后把投影移动回来
-//        mCamera.applyToCanvas(canvas) // 把旋转投影到 Canvas
-//        canvas.translate(-Utils.dp2px(150), -Utils.dp2px(150)) // 旋转之前把绘制内容移动到轴心（原点）
-//        mCamera.restore() // 恢复 Camera 的状态
-
-//        canvas.restore()
+        //绘制右边
+        canvas.save()
+        canvas.translate(mCenterPoint.x, mCenterPoint.y)
+        canvas.rotate(-flipRotation)
+        mCamera.save()
+        mCamera.rotateY(rightFlip)
+        mCamera.applyToCanvas(canvas)
+        mCamera.restore()
+        canvas.clipRect(0, BITMAP_WIDTH.toInt(), BITMAP_WIDTH.toInt(), -BITMAP_WIDTH.toInt())
+        canvas.rotate(flipRotation)
+        canvas.translate(-mCenterPoint.x, -mCenterPoint.y)
+        canvas.drawBitmap(mBitmap, mCenterPoint.x - BITMAP_WIDTH / 2, mCenterPoint.y - BITMAP_WIDTH / 2, mPaint)
+        canvas.restore()
     }
 }
