@@ -42,28 +42,22 @@ class RotateView(context: Context?, attrs: AttributeSet?) : View(context, attrs)
         mBitmap = Utils.decodeBitmap(resources, R.drawable.flip, BITMAP_WIDTH.toInt())
         mCamera.setLocation(0f, 0f, Utils.getZForCamera())
 
-        //右边翻转
+        //动画一：右边翻转
         val rightFlipAnimator = ObjectAnimator.ofFloat(this, "rightFlip", -45f)
-        rightFlipAnimator.duration = 1500
-//        rightFlipAnimator.startDelay = 1000
-//        rightFlipAnimator.start()
+        rightFlipAnimator.duration = 1000
 
+        //动画二：旋转
         val flipRotationAnimator = ObjectAnimator.ofFloat(this, "flipRotation", 270f)
-        flipRotationAnimator.duration = 1500
-//        flipRotationAnimator.startDelay = 1000
-//        flipRotationAnimator.start()
+        flipRotationAnimator.duration = 1000
 
+        //动画三：左边翻转
         val leftFlitAnimator = ObjectAnimator.ofFloat(this, "leftFlip", 45f)
-        leftFlitAnimator.duration = 1500
-//        leftFlitAnimator.startDelay = 1000
-//        leftFlitAnimator.start()
+        leftFlitAnimator.duration = 1000
 
         val animatorSet = AnimatorSet()
         animatorSet.playSequentially(rightFlipAnimator, flipRotationAnimator, leftFlitAnimator)
         animatorSet.startDelay = 1000
         animatorSet.start()
-
-
     }
 
     override fun onSizeChanged(w: Int, h: Int, oldw: Int, oldh: Int) {
@@ -74,8 +68,6 @@ class RotateView(context: Context?, attrs: AttributeSet?) : View(context, attrs)
 
     override fun onDraw(canvas: Canvas) {
         super.onDraw(canvas)
-        //将图片绘制切割成两部分，右边部分进行camera翻转投影
-
         //绘制左边
         canvas.save()
         canvas.translate(mCenterPoint.x, mCenterPoint.y)
