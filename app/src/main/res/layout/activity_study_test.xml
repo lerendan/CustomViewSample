@@ -21,8 +21,32 @@
     <!--android:layout_width="match_parent"-->
     <!--android:layout_height="match_parent"/>-->
 
-    <com.lerendan.customviewsample.study.RotateView
+    <!--<com.lerendan.customviewsample.study.RotateView-->
+    <!--android:layout_width="match_parent"-->
+    <!--android:layout_height="match_parent"/>-->
+
+    <FrameLayout
             android:layout_width="match_parent"
-            android:layout_height="match_parent"/>
+            android:background="@color/colorForgiven"
+            android:layout_height="wrap_content">
+
+        <EditText
+                android:layout_width="match_parent"
+                android:hint="username"
+                android:layout_height="wrap_content"/>
+
+    </FrameLayout>
+
+    <FrameLayout
+            android:layout_width="match_parent"
+            android:background="@color/colorPrimary"
+            android:layout_height="wrap_content">
+
+        <com.lerendan.customviewsample.study.MateriaEditText
+                android:layout_width="match_parent"
+                android:hint="Username"
+                android:layout_height="wrap_content"/>
+
+    </FrameLayout>
 
 </LinearLayout>
