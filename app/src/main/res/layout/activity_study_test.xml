@@ -30,53 +30,56 @@
     <!--android:hint="Username"-->
     <!--android:layout_height="wrap_content"/>-->
 
-    <com.lerendan.customviewsample.study.FlowLayout
-            android:layout_width="match_parent"
-            android:layout_height="match_parent">
-        <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:padding="10dp"
-                android:background="#9c9c9c"
-                android:gravity="center"
-                android:textSize="25dp"
-                android:text="上海市"/>
+    <!--<com.lerendan.customviewsample.study.FlowLayout-->
+    <!--android:layout_width="match_parent"-->
+    <!--android:layout_height="match_parent">-->
+    <!--<TextView-->
+    <!--android:layout_width="wrap_content"-->
+    <!--android:layout_height="wrap_content"-->
+    <!--android:padding="10dp"-->
+    <!--android:background="#9c9c9c"-->
+    <!--android:gravity="center"-->
+    <!--android:textSize="25dp"-->
+    <!--android:text="上海市"/>-->
 
-        <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:padding="10dp"
-                android:background="#FD6464"
-                android:gravity="center"
-                android:textSize="25dp"
-                android:text="广州市"/>
+    <!--<TextView-->
+    <!--android:layout_width="wrap_content"-->
+    <!--android:layout_height="wrap_content"-->
+    <!--android:padding="10dp"-->
+    <!--android:background="#FD6464"-->
+    <!--android:gravity="center"-->
+    <!--android:textSize="25dp"-->
+    <!--android:text="广州市"/>-->
 
-        <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:padding="10dp"
-                android:background="#2196F3"
-                android:gravity="center"
-                android:textSize="25dp"
-                android:text="深圳市深圳市"/>
-        <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:padding="10dp"
-                android:background="#00BCD4"
-                android:gravity="center"
-                android:textSize="25dp"
-                android:text="北京市"/>
-        <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:padding="10dp"
-                android:background="#EEFF41"
-                android:gravity="center"
-                android:textSize="25dp"
-                android:text="杭州市"/>
+    <!--<TextView-->
+    <!--android:layout_width="wrap_content"-->
+    <!--android:layout_height="wrap_content"-->
+    <!--android:padding="10dp"-->
+    <!--android:background="#2196F3"-->
+    <!--android:gravity="center"-->
+    <!--android:textSize="25dp"-->
+    <!--android:text="深圳市深圳市"/>-->
+    <!--<TextView-->
+    <!--android:layout_width="wrap_content"-->
+    <!--android:layout_height="wrap_content"-->
+    <!--android:padding="10dp"-->
+    <!--android:background="#00BCD4"-->
+    <!--android:gravity="center"-->
+    <!--android:textSize="25dp"-->
+    <!--android:text="北京市"/>-->
+    <!--<TextView-->
+    <!--android:layout_width="wrap_content"-->
+    <!--android:layout_height="wrap_content"-->
+    <!--android:padding="10dp"-->
+    <!--android:background="#EEFF41"-->
+    <!--android:gravity="center"-->
+    <!--android:textSize="25dp"-->
+    <!--android:text="杭州市"/>-->
+    <!--</com.lerendan.customviewsample.study.FlowLayout>-->
 
 
-    </com.lerendan.customviewsample.study.FlowLayout>
+    <com.lerendan.customviewsample.study.ScalableImageView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"/>
 
 </LinearLayout>
