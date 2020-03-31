@@ -10,6 +10,7 @@ import android.util.AttributeSet
 import android.view.GestureDetector
 import android.view.MotionEvent
 import android.view.View
+import android.widget.OverScroller
 import com.lerendan.customviewsample.R
 import com.lerendan.customviewsample.Utils
 
@@ -17,7 +18,8 @@ import com.lerendan.customviewsample.Utils
  * Created by danchao on 2020/3/30.
  */
 class ScalableImageView(context: Context?, attrs: AttributeSet?) : View(context, attrs),
-    GestureDetector.OnGestureListener, GestureDetector.OnDoubleTapListener {
+    GestureDetector.OnGestureListener, GestureDetector.OnDoubleTapListener, Runnable {
+
 
 
     val IMAGE_WIDTH = Utils.dp2px(300)
@@ -27,6 +29,8 @@ class ScalableImageView(context: Context?, attrs: AttributeSet?) : View(context,
     var mBitmap: Bitmap
     var offsetX = 0f
     var offsetY = 0f
+    var originalOffsetX = 0f
+    var originalOffsetY = 0f
 
     var smallScale = 0f//内切边
     var bigScale = 0f//外切边
@@ -43,16 +47,19 @@ class ScalableImageView(context: Context?, attrs: AttributeSet?) : View(context,
 
     lateinit var mScaleAnimator: ObjectAnimator
 
+    var scroller: OverScroller
+
     init {
         mBitmap = Utils.decodeBitmap(resources, R.drawable.avatar, IMAGE_WIDTH.toInt())
         mDetector = GestureDetectorCompat(context, this)
+        scroller = OverScroller(context)
     }
 
     override fun onSizeChanged(w: Int, h: Int, oldw: Int, oldh: Int) {
         super.onSizeChanged(w, h, oldw, oldh)
 
-        offsetX = (width - mBitmap.width) / 2f
-        offsetY = (height - mBitmap.height) / 2f
+        originalOffsetX = (width - mBitmap.width) / 2f
+        originalOffsetY = (height - mBitmap.height) / 2f
 
         if (mBitmap.width / mBitmap.height.toFloat() > width / height.toFloat()) {
             smallScale = width / mBitmap.width.toFloat()
@@ -66,11 +73,13 @@ class ScalableImageView(context: Context?, attrs: AttributeSet?) : View(context,
     override fun onDraw(canvas: Canvas) {
         super.onDraw(canvas)
 
+        canvas.translate(offsetX, offsetY)
+
         //放缩
         val scale = smallScale + (bigScale - smallScale) * scaleFraction
 
         canvas.scale(scale, scale, width / 2f, height / 2f)
-        canvas.drawBitmap(mBitmap, offsetX, offsetY, mPaint)
+        canvas.drawBitmap(mBitmap, originalOffsetX, originalOffsetY, mPaint)
 
     }
 
@@ -98,10 +107,40 @@ class ScalableImageView(context: Context?, attrs: AttributeSet?) : View(context,
     }
 
     override fun onFling(e1: MotionEvent?, e2: MotionEvent?, velocityX: Float, velocityY: Float): Boolean {
+        if (isBig) {
+            scroller.fling(
+                offsetX.toInt(), offsetY.toInt(), velocityX.toInt(), velocityY.toInt(),
+                (-(mBitmap.width * bigScale - width) / 2).toInt(),
+                ((mBitmap.width * bigScale - width) / 2).toInt(),
+                (-(mBitmap.height * bigScale - height) / 2).toInt(),
+                ((mBitmap.height * bigScale - height) / 2).toInt(),100,100
+            )
+
+            postOnAnimation(this)
+
+        }
         return false
     }
 
-    override fun onScroll(e1: MotionEvent?, e2: MotionEvent?, distanceX: Float, distanceY: Float): Boolean {
+    override fun run() {
+        if(scroller.computeScrollOffset()) {
+            offsetX = scroller.currX.toFloat()
+            offsetY = scroller.currY.toFloat()
+            invalidate()
+            postOnAnimation(this)
+        }
+    }
+
+    override fun onScroll(down: MotionEvent, e2: MotionEvent, distanceX: Float, distanceY: Float): Boolean {
+        if (isBig) {
+            offsetX -= distanceX
+            offsetX = Math.min(offsetX, (mBitmap.width * bigScale - width) / 2)
+            offsetX = Math.max(offsetX, -(mBitmap.width * bigScale - width) / 2)
+            offsetY -= distanceY
+            offsetY = Math.min(offsetY, (mBitmap.height * bigScale - height) / 2)
+            offsetY = Math.max(offsetY, -(mBitmap.height * bigScale - height) / 2)
+            invalidate()
+        }
         return false
     }
 
@@ -113,6 +152,8 @@ class ScalableImageView(context: Context?, attrs: AttributeSet?) : View(context,
         if (isBig) {
             getScaleAnimator().start()
         } else {
+                offsetX = 0f
+                offsetY = 0f
             getScaleAnimator().reverse()
         }
         return false
