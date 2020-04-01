@@ -2,14 +2,11 @@ package com.lerendan.customviewsample.study
 
 import android.animation.ObjectAnimator
 import android.content.Context
-import android.graphics.Bitmap
-import android.graphics.Canvas
-import android.graphics.Paint
+import android.graphics.*
 import android.support.v4.view.GestureDetectorCompat
 import android.util.AttributeSet
 import android.view.GestureDetector
 import android.view.MotionEvent
-import android.view.ScaleGestureDetector
 import android.view.View
 import android.widget.OverScroller
 import com.lerendan.customviewsample.R
@@ -25,78 +22,79 @@ class ScalableImageView(context: Context?, attrs: AttributeSet?) : View(context,
 
     var mPaint = Paint(Paint.ANTI_ALIAS_FLAG)
     var mBitmap: Bitmap
-    var offsetX = 0f
-    var offsetY = 0f
-    var originalOffsetX = 0f
-    var originalOffsetY = 0f
+    //图片绘制起点
+    private var mBitmapStartPoint = PointF()
+    //图片偏移
+    private var mBitmapOffsetPoint = PointF()
 
-    var smallScale = 0f//内切边
-    var bigScale = 0f//外切边
+    private var mIsBigScale = false//是否是大图
+    private var mSmallScale = 0f//达到内贴边效果的放缩倍数，即小图
+    private var mBigScale = 0f//达到外贴边效果的放缩倍数，即大图
 
-    var mDetector: GestureDetectorCompat
+    lateinit var mScaleAnimator: ObjectAnimator
+    private var mScroller: OverScroller
+    private var mGestureDetector: GestureDetectorCompat
+    private var mGestureListener = MyGestureListener()
 
-    var isBig = false//是否是大图
-
-    var scaleFraction = 0f
+    var mScaleFraction = 0f
         set(value) {
             field = value
             invalidate()
         }
 
-    lateinit var mScaleAnimator: ObjectAnimator
-
-    var scroller: OverScroller
-    var gestureListener = MyGestureListener()
-    var flingRunner = MyFlingRunner()
-
-//    var scaleDetector : ScaleGestureDetector
-
     init {
         mBitmap = Utils.decodeBitmap(resources, R.drawable.avatar, IMAGE_WIDTH.toInt())
-        mDetector = GestureDetectorCompat(context, gestureListener)
-        scroller = OverScroller(context)
-
-//        scaleDetector = ScaleGestureDetector(context)
+        mGestureDetector = GestureDetectorCompat(context, mGestureListener)
+        mScroller = OverScroller(context)
     }
 
     override fun onSizeChanged(w: Int, h: Int, oldw: Int, oldh: Int) {
         super.onSizeChanged(w, h, oldw, oldh)
 
-        originalOffsetX = (width - mBitmap.width) / 2f
-        originalOffsetY = (height - mBitmap.height) / 2f
+        //使得图片初始是居中的
+        mBitmapStartPoint.x = (width - mBitmap.width) / 2f
+        mBitmapStartPoint.y = (height - mBitmap.height) / 2f
 
+        //这里确定两个使原图达到内贴边、外贴边的放缩倍数，
         if (mBitmap.width / mBitmap.height.toFloat() > width / height.toFloat()) {
-            smallScale = width / mBitmap.width.toFloat()
-            bigScale = height / mBitmap.height.toFloat() * OVER_SCALE_FACTOR
+            mSmallScale = width / mBitmap.width.toFloat()
+            mBigScale = height / mBitmap.height.toFloat()
         } else {
-            smallScale = height / mBitmap.height.toFloat()
-            bigScale = width / mBitmap.width.toFloat() * OVER_SCALE_FACTOR
+            mSmallScale = height / mBitmap.height.toFloat()
+            mBigScale = width / mBitmap.width.toFloat()
         }
+        //为了更好的展示拖动效果，这里再乘一个放大系数，使得上下左右都能够拖动
+        mBigScale *= OVER_SCALE_FACTOR
     }
 
     override fun onDraw(canvas: Canvas) {
         super.onDraw(canvas)
-
         //乘以scaleFraction是为了在缩小时恢复到中点
-        canvas.translate(offsetX * scaleFraction, offsetY * scaleFraction)
-
+        canvas.translate(mBitmapOffsetPoint.x * mScaleFraction, mBitmapOffsetPoint.y * mScaleFraction)
         //放缩
-        val scale = smallScale + (bigScale - smallScale) * scaleFraction
-
+        val scale = mSmallScale + (mBigScale - mSmallScale) * mScaleFraction
         canvas.scale(scale, scale, width / 2f, height / 2f)
-        canvas.drawBitmap(mBitmap, originalOffsetX, originalOffsetY, mPaint)
+        canvas.drawBitmap(mBitmap, mBitmapStartPoint.x, mBitmapStartPoint.y, mPaint)
+    }
 
+    override fun onTouchEvent(event: MotionEvent?): Boolean {
+        return mGestureDetector.onTouchEvent(event)
+    }
+
+    override fun computeScroll() {
+        //scroller用法
+        if (mScroller.computeScrollOffset()) {
+            mBitmapOffsetPoint.x = mScroller.currX.toFloat()
+            mBitmapOffsetPoint.y = mScroller.currY.toFloat()
+            invalidate()
+        }
     }
 
     fun getScaleAnimator(): ObjectAnimator {
         if (!this::mScaleAnimator.isInitialized) {
-            mScaleAnimator = ObjectAnimator.ofFloat(this, "scaleFraction", 0f, 1f)
+            mScaleAnimator = ObjectAnimator.ofFloat(this, "mScaleFraction", 0f, 1f)
         }
         return mScaleAnimator
-    }
-
-    override fun onTouchEvent(event: MotionEvent?): Boolean {
-        return mDetector.onTouchEvent(event)
     }
 
     inner class MyGestureListener : GestureDetector.OnGestureListener, GestureDetector.OnDoubleTapListener {
@@ -113,29 +111,27 @@ class ScalableImageView(context: Context?, attrs: AttributeSet?) : View(context,
         }
 
         override fun onFling(e1: MotionEvent?, e2: MotionEvent?, velocityX: Float, velocityY: Float): Boolean {
-            if (isBig) {
-                scroller.fling(
-                    offsetX.toInt(), offsetY.toInt(), velocityX.toInt(), velocityY.toInt(),
-                    (-(mBitmap.width * bigScale - width) / 2).toInt(),
-                    ((mBitmap.width * bigScale - width) / 2).toInt(),
-                    (-(mBitmap.height * bigScale - height) / 2).toInt(),
-                    ((mBitmap.height * bigScale - height) / 2).toInt(), 100, 100
+            if (mIsBigScale) {
+                mScroller.fling(
+                    mBitmapOffsetPoint.x.toInt(), mBitmapOffsetPoint.y.toInt(), velocityX.toInt(), velocityY.toInt(),
+                    (-(mBitmap.width * mBigScale - width) / 2).toInt(),
+                    ((mBitmap.width * mBigScale - width) / 2).toInt(),
+                    (-(mBitmap.height * mBigScale - height) / 2).toInt(),
+                    ((mBitmap.height * mBigScale - height) / 2).toInt(), 100, 100
                 )
-
-                postOnAnimation(flingRunner)
-
+                invalidate()
             }
             return false
         }
 
         override fun onScroll(down: MotionEvent, e2: MotionEvent, distanceX: Float, distanceY: Float): Boolean {
-            if (isBig) {
-                offsetX -= distanceX
-                offsetX = Math.min(offsetX, (mBitmap.width * bigScale - width) / 2)
-                offsetX = Math.max(offsetX, -(mBitmap.width * bigScale - width) / 2)
-                offsetY -= distanceY
-                offsetY = Math.min(offsetY, (mBitmap.height * bigScale - height) / 2)
-                offsetY = Math.max(offsetY, -(mBitmap.height * bigScale - height) / 2)
+            if (mIsBigScale) {
+                mBitmapOffsetPoint.x -= distanceX
+                mBitmapOffsetPoint.x = Math.min(mBitmapOffsetPoint.x, (mBitmap.width * mBigScale - width) / 2)
+                mBitmapOffsetPoint.x = Math.max(mBitmapOffsetPoint.x, -(mBitmap.width * mBigScale - width) / 2)
+                mBitmapOffsetPoint.y -= distanceY
+                mBitmapOffsetPoint.y = Math.min(mBitmapOffsetPoint.y, (mBitmap.height * mBigScale - height) / 2)
+                mBitmapOffsetPoint.y = Math.max(mBitmapOffsetPoint.y, -(mBitmap.height * mBigScale - height) / 2)
                 invalidate()
             }
             return false
@@ -145,12 +141,18 @@ class ScalableImageView(context: Context?, attrs: AttributeSet?) : View(context,
         }
 
         override fun onDoubleTap(e: MotionEvent): Boolean {
-            isBig = !isBig
-            if (isBig) {
+            //切换放大、缩小
+            mIsBigScale = !mIsBigScale
+
+            if (mIsBigScale) {
                 //计算双击点偏移，使在双击的点在放大前后位于同一个点
                 //双击点距离中心 - 放大后的这个点距离中心
-                offsetX = (e.x - width / 2f) - (e.x - width / 2f) * bigScale / smallScale
-                offsetY = (e.y - height / 2f) - (e.y - height / 2f) * bigScale / smallScale
+                mBitmapOffsetPoint.x = (e.x - width / 2f) - (e.x - width / 2f) * mBigScale / mSmallScale
+                mBitmapOffsetPoint.x = Math.min(mBitmapOffsetPoint.x, (mBitmap.width * mBigScale - width) / 2)
+                mBitmapOffsetPoint.x = Math.max(mBitmapOffsetPoint.x, -(mBitmap.width * mBigScale - width) / 2)
+                mBitmapOffsetPoint.y = (e.y - height / 2f) - (e.y - height / 2f) * mBigScale / mSmallScale
+                mBitmapOffsetPoint.y = Math.min(mBitmapOffsetPoint.y, (mBitmap.height * mBigScale - height) / 2)
+                mBitmapOffsetPoint.y = Math.max(mBitmapOffsetPoint.y, -(mBitmap.height * mBigScale - height) / 2)
                 getScaleAnimator().start()
             } else {
                 getScaleAnimator().reverse()
@@ -167,31 +169,13 @@ class ScalableImageView(context: Context?, attrs: AttributeSet?) : View(context,
         }
     }
 
-    inner class MyFlingRunner : Runnable {
-        override fun run() {
-            if (scroller.computeScrollOffset()) {
-                offsetX = scroller.currX.toFloat()
-                offsetY = scroller.currY.toFloat()
-                invalidate()
-                postOnAnimation(flingRunner)
-            }
-        }
+    fun setBitmapOffsetPoint(x: Float, y: Float) {
+        mBitmapOffsetPoint.x = x
+        mBitmapOffsetPoint.x = Math.min(mBitmapOffsetPoint.x, (mBitmap.width * mBigScale - width) / 2)
+        mBitmapOffsetPoint.x = Math.max(mBitmapOffsetPoint.x, -(mBitmap.width * mBigScale - width) / 2)
+        mBitmapOffsetPoint.y = y
+        mBitmapOffsetPoint.y = Math.min(mBitmapOffsetPoint.y, (mBitmap.height * mBigScale - height) / 2)
+        mBitmapOffsetPoint.y = Math.max(mBitmapOffsetPoint.y, -(mBitmap.height * mBigScale - height) / 2)
     }
-
-//    inner class MyScaleGestureListener : ScaleGestureDetector.OnScaleGestureListener{
-//        override fun onScaleBegin(detector: ScaleGestureDetector?): Boolean {
-//            return true
-//        }
-//
-//        override fun onScaleEnd(detector: ScaleGestureDetector?) {
-//        }
-//
-//        override fun onScale(detector: ScaleGestureDetector): Boolean {
-//            scaleFraction = detector.scaleFactor
-//            invalidate()
-//            return false
-//        }
-//
-//    }
 
 }
