@@ -15,7 +15,7 @@ import com.lerendan.customviewsample.Utils
 /**
  * Created by danchao on 2020/3/30.
  */
-class ScalableImageView(context: Context?, attrs: AttributeSet?) : View(context, attrs) {
+class ScalableImageView2(context: Context?, attrs: AttributeSet?) : View(context, attrs) {
 
     //原图大小
     private val IMAGE_WIDTH = Utils.dp2px(300)
