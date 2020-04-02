@@ -78,7 +78,11 @@
     <!--</com.lerendan.customviewsample.study.FlowLayout>-->
 
 
-    <com.lerendan.customviewsample.study.ScalableImageView
+    <!--<com.lerendan.customviewsample.study.ScalableImageView-->
+            <!--android:layout_width="wrap_content"-->
+            <!--android:layout_height="wrap_content"/>-->
+
+    <com.lerendan.customviewsample.study.ScalableImageView2
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"/>
 

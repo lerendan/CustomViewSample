@@ -1,12 +1,14 @@
 package com.lerendan.customviewsample.study
 
 import android.animation.ObjectAnimator
+import android.annotation.SuppressLint
 import android.content.Context
 import android.graphics.*
 import android.support.v4.view.GestureDetectorCompat
 import android.util.AttributeSet
 import android.view.GestureDetector
 import android.view.MotionEvent
+import android.view.ScaleGestureDetector
 import android.view.View
 import android.widget.OverScroller
 import com.lerendan.customviewsample.R
@@ -16,11 +18,13 @@ import com.lerendan.customviewsample.Utils
  * Created by danchao on 2020/3/30.
  */
 class ScalableImageView2(context: Context?, attrs: AttributeSet?) : View(context, attrs) {
+    companion object {
+        //原图大小
+        val IMAGE_WIDTH = Utils.dp2px(300)
+        //放大系数
+        const val OVER_SCALE_FACTOR = 2
+    }
 
-    //原图大小
-    private val IMAGE_WIDTH = Utils.dp2px(300)
-    //放大系数
-    private val OVER_SCALE_FACTOR = 2
     private var mPaint = Paint(Paint.ANTI_ALIAS_FLAG)
     private var mBitmap: Bitmap
     //图片绘制起点
@@ -40,10 +44,12 @@ class ScalableImageView2(context: Context?, attrs: AttributeSet?) : View(context
     private var mScroller: OverScroller
     private var mGestureDetector: GestureDetectorCompat
     private var mGestureListener = MyGestureListener()
+    private var mScaleGestureDetector: ScaleGestureDetector
+    private var mScaleGestureListener = MyScaleListener()
     //属性动画
     lateinit var mScaleAnimator: ObjectAnimator
 
-    var mScaleFraction = 0f
+    private var mCurrentScale = 0f
         set(value) {
             field = value
             invalidate()
@@ -53,6 +59,7 @@ class ScalableImageView2(context: Context?, attrs: AttributeSet?) : View(context
         mBitmap = Utils.decodeBitmap(resources, R.drawable.avatar, IMAGE_WIDTH.toInt())
         mGestureDetector = GestureDetectorCompat(context, mGestureListener)
         mScroller = OverScroller(context)
+        mScaleGestureDetector = ScaleGestureDetector(context, mScaleGestureListener)
     }
 
     override fun onSizeChanged(w: Int, h: Int, oldw: Int, oldh: Int) {
@@ -77,20 +84,34 @@ class ScalableImageView2(context: Context?, attrs: AttributeSet?) : View(context
         //canvas正向偏移最大值
         mCanvasMaxOffsetPoint.x = (mBitmap.width * mBigScale - width) / 2
         mCanvasMaxOffsetPoint.y = (mBitmap.height * mBigScale - height) / 2
+
+        mCurrentScale = mSmallScale
     }
 
     override fun onDraw(canvas: Canvas) {
         super.onDraw(canvas)
         //乘以scaleFraction是为了在缩小时恢复到中点
-        canvas.translate(mCanvasOffsetPoint.x * mScaleFraction, mCanvasOffsetPoint.y * mScaleFraction)
-        //放缩
-        val scale = mSmallScale + (mBigScale - mSmallScale) * mScaleFraction
-        canvas.scale(scale, scale, width / 2f, height / 2f)
+        val scaleFraction = (mCurrentScale - mSmallScale) / (mBigScale - mSmallScale)
+        canvas.translate(mCanvasOffsetPoint.x * scaleFraction, mCanvasOffsetPoint.y * scaleFraction)
+        //放缩倍数
+//        val scale = mSmallScale + (mBigScale - mSmallScale) * mScaleFraction
+        canvas.scale(mCurrentScale, mCurrentScale, width / 2f, height / 2f)
         canvas.drawBitmap(mBitmap, mBitmapStartPoint.x, mBitmapStartPoint.y, mPaint)
     }
 
-    override fun onTouchEvent(event: MotionEvent?): Boolean {
-        return mGestureDetector.onTouchEvent(event)
+    @SuppressLint("ClickableViewAccessibility")
+    override fun onTouchEvent(event: MotionEvent): Boolean {
+//        var result = mScaleGestureDetector.onTouchEvent(event)
+//        //isInProgress 是否正在进行缩放手势
+//        if (!mScaleGestureDetector.isInProgress) {
+//            //根据是否正在进行缩放手势来决定谁来接管onTouchEvent
+//            result = mGestureDetector.onTouchEvent(event)
+//        }
+//        return result
+
+        return if (event.pointerCount > 1) mScaleGestureDetector.onTouchEvent(event)
+        else mGestureDetector.onTouchEvent(event)
+
     }
 
     override fun computeScroll() {
@@ -107,8 +128,9 @@ class ScalableImageView2(context: Context?, attrs: AttributeSet?) : View(context
      */
     fun getScaleAnimator(): ObjectAnimator {
         if (!this::mScaleAnimator.isInitialized) {
-            mScaleAnimator = ObjectAnimator.ofFloat(this, "mScaleFraction", 0f, 1f)
+            mScaleAnimator = ObjectAnimator.ofFloat(this, "mCurrentScale", 0f)
         }
+        mScaleAnimator.setFloatValues(mSmallScale, mBigScale)
         return mScaleAnimator
     }
 
@@ -192,4 +214,26 @@ class ScalableImageView2(context: Context?, attrs: AttributeSet?) : View(context
         }
     }
 
+    inner class MyScaleListener : ScaleGestureDetector.OnScaleGestureListener {
+        private var initialScale = 0f
+
+        override fun onScaleBegin(detector: ScaleGestureDetector?): Boolean {
+            //记录当前缩放值
+            initialScale = mCurrentScale
+            return true
+        }
+
+        override fun onScaleEnd(detector: ScaleGestureDetector) {
+        }
+
+        override fun onScale(detector: ScaleGestureDetector): Boolean {
+            mCurrentScale = initialScale * detector.scaleFactor
+            //限制最大值和最小值
+            mCurrentScale = Math.min(mCurrentScale, mBigScale)
+            mCurrentScale = Math.max(mCurrentScale, mSmallScale)
+            invalidate()
+            return false
+        }
+
+    }
 }

@@ -1,6 +1,7 @@
 package com.lerendan.customviewsample.study
 
 import android.animation.ObjectAnimator
+import android.annotation.SuppressLint
 import android.content.Context
 import android.graphics.*
 import android.support.v4.view.GestureDetectorCompat
@@ -16,11 +17,13 @@ import com.lerendan.customviewsample.Utils
  * Created by danchao on 2020/3/30.
  */
 class ScalableImageView(context: Context?, attrs: AttributeSet?) : View(context, attrs) {
+    companion object {
+        //原图大小
+        val IMAGE_WIDTH = Utils.dp2px(300)
+        //放大系数
+        const val OVER_SCALE_FACTOR = 2
+    }
 
-    //原图大小
-    private val IMAGE_WIDTH = Utils.dp2px(300)
-    //放大系数
-    private val OVER_SCALE_FACTOR = 2
     private var mPaint = Paint(Paint.ANTI_ALIAS_FLAG)
     private var mBitmap: Bitmap
     //图片绘制起点
@@ -41,9 +44,9 @@ class ScalableImageView(context: Context?, attrs: AttributeSet?) : View(context,
     private var mGestureDetector: GestureDetectorCompat
     private var mGestureListener = MyGestureListener()
     //属性动画
-    lateinit var mScaleAnimator: ObjectAnimator
+    private lateinit var mScaleAnimator: ObjectAnimator
 
-    var mScaleFraction = 0f
+    private var mScaleFraction = 0f
         set(value) {
             field = value
             invalidate()
@@ -83,12 +86,13 @@ class ScalableImageView(context: Context?, attrs: AttributeSet?) : View(context,
         super.onDraw(canvas)
         //乘以scaleFraction是为了在缩小时恢复到中点
         canvas.translate(mCanvasOffsetPoint.x * mScaleFraction, mCanvasOffsetPoint.y * mScaleFraction)
-        //放缩
+        //放缩倍数
         val scale = mSmallScale + (mBigScale - mSmallScale) * mScaleFraction
         canvas.scale(scale, scale, width / 2f, height / 2f)
         canvas.drawBitmap(mBitmap, mBitmapStartPoint.x, mBitmapStartPoint.y, mPaint)
     }
 
+    @SuppressLint("ClickableViewAccessibility")
     override fun onTouchEvent(event: MotionEvent?): Boolean {
         return mGestureDetector.onTouchEvent(event)
     }
