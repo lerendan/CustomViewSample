@@ -101,16 +101,16 @@ class ScalableImageView2(context: Context?, attrs: AttributeSet?) : View(context
 
     @SuppressLint("ClickableViewAccessibility")
     override fun onTouchEvent(event: MotionEvent): Boolean {
-//        var result = mScaleGestureDetector.onTouchEvent(event)
-//        //isInProgress 是否正在进行缩放手势
-//        if (!mScaleGestureDetector.isInProgress) {
-//            //根据是否正在进行缩放手势来决定谁来接管onTouchEvent
-//            result = mGestureDetector.onTouchEvent(event)
-//        }
-//        return result
+        var result = mScaleGestureDetector.onTouchEvent(event)
+        //isInProgress 是否正在进行缩放手势
+        if (!mScaleGestureDetector.isInProgress) {
+            //根据是否正在进行缩放手势来决定谁来接管onTouchEvent
+            result = mGestureDetector.onTouchEvent(event)
+        }
+        return result
 
-        return if (event.pointerCount > 1) mScaleGestureDetector.onTouchEvent(event)
-        else mGestureDetector.onTouchEvent(event)
+//        return if (event.pointerCount > 1) mScaleGestureDetector.onTouchEvent(event)
+//        else mGestureDetector.onTouchEvent(event)
 
     }
 
@@ -174,9 +174,13 @@ class ScalableImageView2(context: Context?, attrs: AttributeSet?) : View(context
         }
 
         override fun onScroll(down: MotionEvent, e2: MotionEvent, distanceX: Float, distanceY: Float): Boolean {
-            //大图模式时才可以滑动
-            if (mIsBigScale) {
-                //限制滚动边界
+//            //大图模式时才可以滑动
+//            if (mIsBigScale) {
+//                //限制滚动边界
+//                setBitmapOffsetPoint(mCanvasOffsetPoint.x - distanceX, mCanvasOffsetPoint.y - distanceY)
+//                invalidate()
+//            }
+            if(mCurrentScale > mSmallScale){
                 setBitmapOffsetPoint(mCanvasOffsetPoint.x - distanceX, mCanvasOffsetPoint.y - distanceY)
                 invalidate()
             }
