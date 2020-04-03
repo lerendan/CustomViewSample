@@ -108,10 +108,6 @@ class ScalableImageView2(context: Context?, attrs: AttributeSet?) : View(context
             result = mGestureDetector.onTouchEvent(event)
         }
         return result
-
-//        return if (event.pointerCount > 1) mScaleGestureDetector.onTouchEvent(event)
-//        else mGestureDetector.onTouchEvent(event)
-
     }
 
     override fun computeScroll() {
@@ -130,7 +126,9 @@ class ScalableImageView2(context: Context?, attrs: AttributeSet?) : View(context
         if (!this::mScaleAnimator.isInitialized) {
             mScaleAnimator = ObjectAnimator.ofFloat(this, "mCurrentScale", 0f)
         }
-        mScaleAnimator.setFloatValues(mSmallScale, mBigScale)
+        if (mIsBigScale) mScaleAnimator.setFloatValues(mSmallScale, mBigScale)
+        else mScaleAnimator.setFloatValues(mSmallScale, mCurrentScale)
+
         return mScaleAnimator
     }
 
@@ -155,6 +153,10 @@ class ScalableImageView2(context: Context?, attrs: AttributeSet?) : View(context
         }
 
         override fun onDown(e: MotionEvent?): Boolean {
+            //手指按下时如果还在滚动则停止滚动
+            if (!mScroller.isFinished) {
+                mScroller.abortAnimation()
+            }
             //down事件，必须返回true，否则后面的事件就收不到了
             return true
         }
@@ -174,13 +176,9 @@ class ScalableImageView2(context: Context?, attrs: AttributeSet?) : View(context
         }
 
         override fun onScroll(down: MotionEvent, e2: MotionEvent, distanceX: Float, distanceY: Float): Boolean {
-//            //大图模式时才可以滑动
-//            if (mIsBigScale) {
-//                //限制滚动边界
-//                setBitmapOffsetPoint(mCanvasOffsetPoint.x - distanceX, mCanvasOffsetPoint.y - distanceY)
-//                invalidate()
-//            }
-            if(mCurrentScale > mSmallScale){
+            //大图模式时才可以滑动
+            if (mIsBigScale) {
+                //限制滚动边界
                 setBitmapOffsetPoint(mCanvasOffsetPoint.x - distanceX, mCanvasOffsetPoint.y - distanceY)
                 invalidate()
             }
@@ -235,6 +233,18 @@ class ScalableImageView2(context: Context?, attrs: AttributeSet?) : View(context
             //限制最大值和最小值
             mCurrentScale = Math.min(mCurrentScale, mBigScale)
             mCurrentScale = Math.max(mCurrentScale, mSmallScale)
+
+            //超过内贴边缩放倍数即定义为大图
+            mIsBigScale = mCurrentScale > mSmallScale
+            //正在放大
+            if (detector.scaleFactor > 1) {
+                //focusX、focusY是多指的中心
+                setBitmapOffsetPoint(
+                    (detector.focusX - width / 2f) - (detector.focusX - width / 2f) * mBigScale / mSmallScale,
+                    (detector.focusY - height / 2f) - (detector.focusY - height / 2f) * mBigScale / mSmallScale
+                )
+            }
+
             invalidate()
             return false
         }

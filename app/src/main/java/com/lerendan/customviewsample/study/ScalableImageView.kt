@@ -137,6 +137,10 @@ class ScalableImageView(context: Context?, attrs: AttributeSet?) : View(context,
         }
 
         override fun onDown(e: MotionEvent?): Boolean {
+            //手指按下时如果还在滚动则停止滚动
+            if (!mScroller.isFinished) {
+                mScroller.abortAnimation()
+            }
             //down事件，必须返回true，否则后面的事件就收不到了
             return true
         }
