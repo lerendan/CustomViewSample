@@ -14,7 +14,6 @@ import com.lerendan.customviewsample.Utils
 
 /**
  * 多指触控：接力形
- * Created by danchao on 2020/4/3.
  */
 class MultiTouchView1(context: Context?, attrs: AttributeSet?) : View(context, attrs) {
 
@@ -41,14 +40,8 @@ class MultiTouchView1(context: Context?, attrs: AttributeSet?) : View(context, a
     @SuppressLint("ClickableViewAccessibility")
     override fun onTouchEvent(event: MotionEvent): Boolean {
         when (event.actionMasked) {
-//            MotionEvent.ACTION_DOWN -> {
-//                setTrackingPoint(0, event)
-//            }
-//            MotionEvent.ACTION_POINTER_DOWN -> {
-//                setTrackingPoint(event.actionIndex, event)
-//            }
             MotionEvent.ACTION_DOWN, MotionEvent.ACTION_POINTER_DOWN -> {
-                setTrackingPoint(event.actionIndex, event)
+                setTrackingPointer(event.actionIndex, event)
             }
             MotionEvent.ACTION_MOVE -> {
                 val index = event.findPointerIndex(mTrackingPointerId)
@@ -65,10 +58,10 @@ class MultiTouchView1(context: Context?, attrs: AttributeSet?) : View(context, a
                 val pointerId = event.getPointerId(actionIndex)
                 //看抬起的手指是否是当前正在监控的手指
                 if (pointerId == mTrackingPointerId) {
-                    //todo 判断抬起的手指是否是最后一个,并将当前追踪点设置为最后一个index对应的point
+                    //判断抬起的手指是否是最后一个,并将当前追踪点设置为最后一个index对应的point
                     val newIndex =
                         if (actionIndex == event.pointerCount - 1) event.pointerCount - 2 else event.pointerCount - 1
-                    setTrackingPoint(newIndex, event)
+                    setTrackingPointer(newIndex, event)
                 }
             }
         }
@@ -76,9 +69,9 @@ class MultiTouchView1(context: Context?, attrs: AttributeSet?) : View(context, a
     }
 
     /**
-     * 设置追踪的Point
+     * 设置当前追踪的 Pointer
      */
-    private fun setTrackingPoint(newPointIndex: Int, event: MotionEvent) {
+    private fun setTrackingPointer(newPointIndex: Int, event: MotionEvent) {
         mTrackingPointerId = event.getPointerId(newPointIndex)
         mDownPoint.x = event.getX(newPointIndex)
         mDownPoint.y = event.getY(newPointIndex)

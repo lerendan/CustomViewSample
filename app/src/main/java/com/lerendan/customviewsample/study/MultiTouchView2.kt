@@ -15,7 +15,6 @@ import com.lerendan.customviewsample.Utils
 /**
  * 多指触控：协作型
  * 忽略个体，只看整体的焦点
- * Created by danchao on 2020/4/3.
  */
 class MultiTouchView2(context: Context?, attrs: AttributeSet?) : View(context, attrs) {
 
@@ -32,6 +31,10 @@ class MultiTouchView2(context: Context?, attrs: AttributeSet?) : View(context, a
     private var mCanvasOffsetPoint = PointF()
     //canvas上一次偏移坐标
     private var mCanvasLastOffsetPoint = PointF()
+    //所有pointer的焦点(中心点)
+    private var mPointerFocusPoint = PointF()
+    //pointer数量
+    private var mPointerCount = 0
 
     init {
         mBitmap = Utils.decodeBitmap(resources, R.drawable.avatar, IMAGE_WIDTH.toInt())
@@ -39,38 +42,42 @@ class MultiTouchView2(context: Context?, attrs: AttributeSet?) : View(context, a
 
     @SuppressLint("ClickableViewAccessibility")
     override fun onTouchEvent(event: MotionEvent): Boolean {
-
+        //pointer数量
+        mPointerCount = event.pointerCount
+        //所有pointer的x、y总和
         var sumX = 0f
         var sumY = 0f
-        var pointerCount = event.pointerCount
+        //是否是pointer_up事件
+        val isPointerUp = event.actionMasked == MotionEvent.ACTION_POINTER_UP
 
-        var isPointerUp = event.actionMasked == MotionEvent.ACTION_POINTER_UP
-
-        for (i in 0 until pointerCount) {
+        for (i in 0 until mPointerCount) {
+            //抬起的那个pointer不用计算
             if (!(isPointerUp && i == event.actionIndex)) {
                 sumX += event.getX(i)
                 sumY += event.getY(i)
             }
         }
 
-        if(isPointerUp){
-            pointerCount -= 1
+        if (isPointerUp) {
+            //如果是pointer_up抬起事件，则pointer总数量-1
+            mPointerCount -= 1
         }
-        var focusX = sumX / pointerCount
-        var focusY = sumY / pointerCount
+        //计算焦点
+        mPointerFocusPoint.x = sumX / mPointerCount
+        mPointerFocusPoint.y = sumY / mPointerCount
 
         when (event.actionMasked) {
             MotionEvent.ACTION_DOWN,
             MotionEvent.ACTION_POINTER_DOWN,
             MotionEvent.ACTION_POINTER_UP -> {
-                mDownPoint.x = focusX
-                mDownPoint.y = focusY
+                mDownPoint.x = mPointerFocusPoint.x
+                mDownPoint.y = mPointerFocusPoint.y
                 mCanvasLastOffsetPoint.x = mCanvasOffsetPoint.x
                 mCanvasLastOffsetPoint.y = mCanvasOffsetPoint.y
             }
             MotionEvent.ACTION_MOVE -> {
-                mCanvasOffsetPoint.x = mCanvasLastOffsetPoint.x + focusX - mDownPoint.x
-                mCanvasOffsetPoint.y = mCanvasLastOffsetPoint.y + focusY - mDownPoint.y
+                mCanvasOffsetPoint.x = mCanvasLastOffsetPoint.x + mPointerFocusPoint.x - mDownPoint.x
+                mCanvasOffsetPoint.y = mCanvasLastOffsetPoint.y + mPointerFocusPoint.y - mDownPoint.y
                 invalidate()
             }
         }

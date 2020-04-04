@@ -86,7 +86,7 @@
             <!--android:layout_width="wrap_content"-->
             <!--android:layout_height="wrap_content"/>-->
 
-    <com.lerendan.customviewsample.study.MultiTouchView2
+    <com.lerendan.customviewsample.study.MultiTouchView3
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"/>
 
