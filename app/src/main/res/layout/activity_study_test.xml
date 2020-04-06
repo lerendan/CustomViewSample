@@ -79,15 +79,30 @@
 
 
     <!--<com.lerendan.customviewsample.study.ScalableImageView-->
-            <!--android:layout_width="wrap_content"-->
-            <!--android:layout_height="wrap_content"/>-->
+    <!--android:layout_width="wrap_content"-->
+    <!--android:layout_height="wrap_content"/>-->
 
     <!--<com.lerendan.customviewsample.study.ScalableImageView2-->
-            <!--android:layout_width="wrap_content"-->
-            <!--android:layout_height="wrap_content"/>-->
+    <!--android:layout_width="wrap_content"-->
+    <!--android:layout_height="wrap_content"/>-->
 
-    <com.lerendan.customviewsample.study.MultiTouchView3
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"/>
+    <!--<com.lerendan.customviewsample.study.MultiTouchView3-->
+    <!--android:layout_width="wrap_content"-->
+    <!--android:layout_height="wrap_content"/>-->
+
+    <com.lerendan.customviewsample.study.TwoPager
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+        <View android:layout_width="match_parent"
+              android:background="@color/colorPrimary"
+              android:layout_height="match_parent"/>
+
+        <View android:layout_width="match_parent"
+              android:background="@color/colorForgiven"
+              android:layout_height="match_parent"/>
+
+
+    </com.lerendan.customviewsample.study.TwoPager>
 
 </LinearLayout>
